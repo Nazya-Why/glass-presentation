@@ -36,7 +36,7 @@
     document.body.classList.toggle('is-content', !s.classList.contains('hero'));
     if (window.BG) window.BG.setPreset(s.dataset.bg || 'hero', first);
     first = false;
-    history.replaceState(null, '', `#${index + 1}`);
+    try { history.replaceState(null, '', `#${index + 1}`); } catch (e) { /* sandboxed viewer */ }
   }
 
   const next = () => go(index + 1);
@@ -48,8 +48,8 @@
     else if (e.key === 'Home') go(0);
     else if (e.key === 'End') go(slides.length - 1);
     else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-      else document.exitFullscreen?.();
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+      else document.exitFullscreen?.().catch(() => {});
     }
   });
   window.addEventListener('click', (e) => {
