@@ -26,18 +26,18 @@ body { -webkit-font-smoothing: antialiased; }
 body.is-content .shade { opacity: 1; }
 
 /* ---------- Side rail (right) ---------- */
-.rail { position: fixed; right: 46px; top: 0; height: 100vh; z-index: 10; display: flex; flex-direction: column;
+.rail { position: fixed; right: 30px; top: 0; height: 100vh; z-index: 10; display: flex; flex-direction: column;
   justify-content: center; align-items: flex-end; pointer-events: none; }
-.ticks { display: flex; flex-direction: column; align-items: flex-end; gap: 11px; pointer-events: auto; }
-.ticks button { width: 16px; height: 3px; border-radius: 3px; border: 0; padding: 0; cursor: pointer;
+.ticks { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; pointer-events: auto; }
+.ticks button { width: 11px; height: 2px; border-radius: 2px; border: 0; padding: 0; cursor: pointer;
   background: rgba(255,255,255,0.20); transition: width .45s var(--ease), background .45s var(--ease), box-shadow .45s var(--ease); }
 .ticks button.seen { background: rgba(255,255,255,0.38); }
-.ticks button.on { width: 42px; background: var(--accent-2); box-shadow: 0 0 16px rgba(140,149,255,.75); }
-.ticks button:hover { width: 30px; background: var(--ink-2); }
+.ticks button.on { width: 26px; background: var(--accent-2); box-shadow: 0 0 12px rgba(140,149,255,.7); }
+.ticks button:hover { width: 19px; background: var(--ink-2); }
 
 /* ---------- Slide counter (top-right) ---------- */
-.counter { position: fixed; top: 40px; right: 52px; z-index: 10; font-family: var(--mono); font-size: 14px; color: var(--ink-2); letter-spacing: .06em; }
-.counter b { color: var(--ink); font-weight: 600; font-size: 18px; }
+.counter { position: fixed; top: 24px; right: 28px; z-index: 10; font-family: var(--mono); font-size: 12px; color: var(--ink-2); letter-spacing: .06em; }
+.counter b { color: var(--ink); font-weight: 600; font-size: 15px; }
 .counter i { font-style: normal; color: var(--ink-3); }
 
 /* ---------- Scaled 1920×1080 stage ---------- */
