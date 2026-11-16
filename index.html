@@ -13,285 +13,342 @@
 <canvas id="bg" aria-hidden="true"></canvas>
 <div class="shade" aria-hidden="true"></div>
 
-<header class="topbar">
-      <div class="brand"><span class="mark"></span><span>SQL Injection · Лаб. №8</span></div>
-      <nav class="sections" id="sections">
-        <span data-section="intro">Вступ</span>
-        <span data-section="logic">Логіка запиту</span>
-        <span data-section="recon">Розвідка СУБД</span>
-        <span data-section="leak">Витік даних</span>
-        <span data-section="outro">Висновки</span>
-      </nav>
-      <div class="topbar-right">
-        <span class="pill ghost">КБ-307</span>
-        <span class="pill solid" id="counter">01 / 17</span>
+<!-- side rail: one tick per slide, current one highlighted -->
+<aside class="rail" id="rail" aria-hidden="true">
+  <div class="rail-top"><span class="rail-brand">SQLi · №8</span></div>
+  <div class="ticks" id="ticks"></div>
+  <div class="rail-count"><b id="cnt">01</b><span>/ <i id="tot">16</i></span></div>
+</aside>
+
+<main class="stage" id="stage">
+
+  <!-- 01 — Титул -->
+  <section class="slide hero" data-bg="hero" data-title="Обкладинка">
+    <div class="center">
+      <p class="eyebrow r">Лабораторна робота №8 · Безпека веб-додатків</p>
+      <h1 class="display r">SQL-ін'єкції<br><span class="dim">від прихованих даних до паролів адміністратора</span></h1>
+      <p class="lead r">Отримання даних, обхід авторизації, визначення структури БД та витік конфіденційної інформації.</p>
+      <div class="row r">
+        <span class="pill outline">Виконала: Дзяман Наталія, КБ-307</span>
+        <span class="pill outline">Прийняв: Побережник В. О.</span>
       </div>
-    </header>
+    </div>
+    <p class="foot r">НУ «Львівська політехніка» · ІКТА · кафедра ЗІ · 2026</p>
+  </section>
 
-    <main class="deck" id="deck">
-
-    <!-- 01 — Титул -->
-    <section class="slide hero" data-bg="hero" data-section="intro">
-      <div class="center">
-        <p class="eyebrow r">Лабораторна робота №8 · Безпека веб-додатків</p>
-        <h1 class="display r">SQL-ін'єкції<br><span class="dim">від прихованих даних до паролів адміністратора</span></h1>
-        <p class="lead r">Отримання даних, обхід авторизації, визначення структури БД та витік конфіденційної інформації.</p>
-        <div class="row r">
-          <span class="pill outline">Виконала: Дзяман Наталія, КБ-307</span>
-          <span class="pill outline">Прийняв: Побережник В. О.</span>
-        </div>
+  <!-- 02 — Мета -->
+  <section class="slide" data-bg="right" data-title="Мета">
+    <div class="content">
+      <p class="eyebrow r">Мета роботи</p>
+      <h2 class="title r">Зрозуміти SQL-ін'єкції — <span class="dim">чому виникають, як знайти, експлуатувати й закрити</span></h2>
+      <div class="grid3">
+        <article class="card r"><span class="num">ЧОМУ</span><h3>Ввід стає кодом</h3><p>Дані користувача підставляються в SQL-запит без фільтрації чи параметризації — і змінюють його логіку.</p></article>
+        <article class="card r"><span class="num">ДЕ</span><h3>WHERE, логін, UNION</h3><p>Параметри URL, поля форми входу, вибірки товарів — будь-яке місце, де ввід потрапляє в запит.</p></article>
+        <article class="card r"><span class="num">ЗАХИСТ</span><h3>Prepared Statements</h3><p>Параметризовані запити та сувора валідація й санітизація всього, що надходить від користувача.</p></article>
       </div>
-      <p class="foot r">НУ «Львівська політехніка» · ІКТА · кафедра ЗІ · 2026</p>
-    </section>
+      <p class="note r">Усі атаки виконано в контрольованому середовищі <b>PortSwigger Web Security Academy</b>.</p>
+    </div>
+  </section>
 
-    <!-- 02 — Мета -->
-    <section class="slide" data-bg="right" data-section="intro">
-      <div class="content">
-        <p class="eyebrow r">Мета роботи</p>
-        <h2 class="title r">Зрозуміти SQL-ін'єкції — <span class="dim">чому виникають, як знайти, експлуатувати й закрити</span></h2>
-        <div class="grid3">
-          <article class="card r"><span class="num">ЧОМУ</span><h3>Ввід стає кодом</h3><p>Дані користувача підставляються в SQL-запит без фільтрації чи параметризації — і змінюють його логіку.</p></article>
-          <article class="card r"><span class="num">ДЕ</span><h3>WHERE, логін, UNION</h3><p>Параметри URL, поля форми входу, вибірки товарів — будь-яке місце, де ввід потрапляє в запит.</p></article>
-          <article class="card r"><span class="num">ЗАХИСТ</span><h3>Prepared Statements</h3><p>Параметризовані запити та сувора валідація й санітизація всього, що надходить від користувача.</p></article>
-        </div>
-        <p class="note r">Усі атаки виконано в контрольованому середовищі <b>PortSwigger Web Security Academy</b>.</p>
+  <!-- 03 — Завдання -->
+  <section class="slide" data-bg="top" data-title="Завдання">
+    <div class="content">
+      <p class="eyebrow r">Завдання</p>
+      <h2 class="title r">7 лабораторій — <span class="dim">від простого до витоку даних</span></h2>
+      <ol class="agenda two">
+        <li class="r"><b>01</b><span>WHERE: отримання прихованих даних</span></li>
+        <li class="r"><b>02</b><span>Обхід авторизації (login bypass)</span></li>
+        <li class="r"><b>03</b><span>Тип і версія СУБД — Oracle</span></li>
+        <li class="r"><b>04</b><span>Тип і версія — MySQL / Microsoft</span></li>
+        <li class="r"><b>05</b><span>Вміст БД — не-Oracle</span></li>
+        <li class="r"><b>06</b><span>Вміст БД — Oracle</span></li>
+        <li class="r"><b>07</b><span>UNION: кількість стовпців запиту</span></li>
+        <li class="r done"><b>✓</b><span>Усі 7 лабораторій розв'язано</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 04 — Анатомія -->
+  <section class="slide" data-bg="left" data-title="Анатомія атаки">
+    <div class="content">
+      <p class="eyebrow r">Анатомія атаки</p>
+      <h2 class="title r">Три символи, що <span class="dim">переписують запит</span></h2>
+      <div class="code big r"><span class="kw">SELECT</span> * <span class="kw">FROM</span> products <span class="kw">WHERE</span> category = 'Gifts<span class="inj">' OR 1=1--</span><span class="cm"> AND released = 1</span></div>
+      <div class="grid3 tokens">
+        <article class="card r"><span class="tok">'</span><h3>Закриває рядок</h3><p>Одинарна лапка завершує строкове значення — далі можна писати власний SQL.</p></article>
+        <article class="card r"><span class="tok">OR 1=1</span><h3>Завжди істина</h3><p>Умова виконується для кожного рядка, тож фільтр перестає щось відсіювати.</p></article>
+        <article class="card r"><span class="tok">--</span><h3>Решта — коментар</h3><p>Усе після подвійного дефіса, зокрема <code>AND released = 1</code>, ігнорується.</p></article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 03 — Завдання -->
-    <section class="slide" data-bg="top" data-section="intro">
-      <div class="content">
-        <p class="eyebrow r">Завдання</p>
-        <h2 class="title r">7 лабораторій — <span class="dim">від простого до витоку даних</span></h2>
-        <ol class="agenda two">
-          <li class="r"><b>01</b><span>WHERE: отримання прихованих даних</span></li>
-          <li class="r"><b>02</b><span>Обхід авторизації (login bypass)</span></li>
-          <li class="r"><b>03</b><span>Тип і версія СУБД — Oracle</span></li>
-          <li class="r"><b>04</b><span>Тип і версія — MySQL / Microsoft</span></li>
-          <li class="r"><b>05</b><span>Вміст БД — не-Oracle</span></li>
-          <li class="r"><b>06</b><span>Вміст БД — Oracle</span></li>
-          <li class="r"><b>07</b><span>UNION: кількість стовпців запиту</span></li>
-          <li class="r done"><b>✓</b><span>Усі 7 лабораторій розв'язано</span></li>
-        </ol>
+  <!-- 05 — Доказ: Завдання 1 -->
+  <section class="slide s-evidence" data-bg="corner" data-title="Завдання 1 · WHERE">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 1 · WHERE</p>
+      <h2 class="title sm r">Приховані товари <span class="dim">стають видимими</span></h2>
+      <p class="payload r"><code>Gifts' OR 1=1--</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">02</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig2.png" data-url="web-security-academy.net" data-cap="Рис. 1 — Введення SQL-пейлоаду в адресний рядок браузера. На рисунку продемонстровано модифікацію параметра category в URL-адресі шляхом додавання конструкції &#x27; OR 1=1--.">Введення SQL-пейлоаду в адресний рядок браузера: модифікація параметра <code>category</code> додаванням <code>' OR 1=1--</code>.</div>
+<div data-fig="img/fig3.png" data-url="web-security-academy.net" data-cap="Рис. 2 — Успішне розв&#x27;язання лабораторного завдання. Після виконання SQL-ін&#x27;єкції система відобразила приховані дані та сповістила про успішне проходження лабораторії.">Після ін'єкції система відобразила приховані товари та повідомила про успішне проходження лабораторії.</div>
+    </div>
+  </section>
 
-    <!-- 04 — Анатомія -->
-    <section class="slide" data-bg="left" data-section="logic">
-      <div class="content">
-        <p class="eyebrow r">Анатомія атаки</p>
-        <h2 class="title r">Три символи, що <span class="dim">переписують запит</span></h2>
-        <div class="code big r"><span class="kw">SELECT</span> * <span class="kw">FROM</span> products <span class="kw">WHERE</span> category = 'Gifts<span class="inj">' OR 1=1--</span><span class="cm"> AND released = 1</span></div>
-        <div class="grid3 tokens">
-          <article class="card r"><span class="tok">'</span><h3>Закриває рядок</h3><p>Одинарна лапка завершує строкове значення — далі можна писати власний SQL.</p></article>
-          <article class="card r"><span class="tok">OR 1=1</span><h3>Завжди істина</h3><p>Умова виконується для кожного рядка, тож фільтр перестає щось відсіювати.</p></article>
-          <article class="card r"><span class="tok">--</span><h3>Решта — коментар</h3><p>Усе після подвійного дефіса, зокрема <code>AND released = 1</code>, ігнорується.</p></article>
-        </div>
+  <!-- 06 — Доказ: Завдання 2 -->
+  <section class="slide s-evidence" data-bg="bottom" data-title="Завдання 2 · Login bypass">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 2 · Login bypass</p>
+      <h2 class="title sm r">Вхід адміністратором <span class="dim">без пароля</span></h2>
+      <p class="payload r"><code>administrator'--</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">02</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig4.png" data-url="web-security-academy.net" data-cap="Рис. 3 — Форма авторизації з введеним SQL-пейлоадом administrator&#x27;-- у полі Username.">У поле <b>Username</b> введено <code>administrator'--</code> — перевірка пароля стає коментарем.</div>
+<div data-fig="img/fig5.png" data-url="web-security-academy.net" data-cap="Рис. 4 — Успішна авторизація: панель адміністратора та повідомлення про проходження лабораторії.">Сервер авторизував сесію адміністратора без перевірки пароля — лабораторію пройдено.</div>
+    </div>
+  </section>
 
-    <!-- 05 — Завдання 1 -->
-    <section class="slide" data-bg="corner" data-section="logic">
-      <div class="content task">
-        <div class="task-text">
-          <p class="eyebrow r">Завдання 1 · WHERE</p>
-          <h2 class="title r">Приховані товари <span class="dim">стають видимими</span></h2>
-          <p class="body r">Параметр <code>category</code> з URL потрапляє в запит без фільтрації. Пейлоад вимикає умову <code>released = 1</code>, і база повертає всі рядки таблиці <code>products</code>.</p>
-          <div class="code r"><span class="cm">// було</span>
-<span class="kw">WHERE</span> category = 'Gifts' <span class="kw">AND</span> released = 1
-<span class="cm">// стало</span>
-<span class="kw">WHERE</span> category = 'Gifts<span class="inj">' OR 1=1--</span></div>
-          <p class="payload r">Пейлоад: <code>Gifts' OR 1=1--</code></p>
-        </div>
-        <figure class="r"><div class="frame" style="--mh: 700px"><img src="img/t1-solved.png" alt="Приховані товари після інʼєкції"></div><figcaption>Рис. 2 — сторінка показує приховані товари, лабораторію розв'язано</figcaption></figure>
+  <!-- 07 — Розділ -->
+  <section class="slide hero" data-bg="section" data-title="Розвідка СУБД">
+    <div class="center">
+      <p class="eyebrow r">Завдання 3–4</p>
+      <h1 class="display r">Розвідка СУБД<br><span class="dim">UNION-атаки на тип і версію</span></h1>
+      <p class="lead r">Знаючи СУБД, можна обрати правильний синтаксис і системні таблиці для наступних кроків.</p>
+    </div>
+  </section>
+
+  <!-- 08 — Доказ: Завдання 3 -->
+  <section class="slide s-evidence" data-bg="right" data-title="Завдання 3 · Oracle">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 3 · Oracle</p>
+      <h2 class="title sm r">Версія Oracle <span class="dim">через v$version</span></h2>
+      <p class="payload r"><code>' UNION SELECT banner,NULL FROM v$version--</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">05</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig6.png" data-url="web-security-academy.net" data-cap="Рис. 5 — Перехід до категорії товарів Gifts.">Перехід до категорії <code>Gifts</code> — у URL з'являється вразливий параметр <code>category</code>.</div>
+<div data-fig="img/fig7.png" data-url="web-security-academy.net" data-cap="Рис. 6 — Визначення кількості стовпців: UNION SELECT NULL,NULL FROM DUAL--.">Визначення кількості стовпців: <code>' UNION SELECT NULL,NULL FROM DUAL--</code>. В Oracle <code>FROM</code> обов'язковий.</div>
+<div data-fig="img/fig8.png" data-url="web-security-academy.net" data-cap="Рис. 7 — Сторінка без помилки: запит повертає рівно два стовпці.">Сторінка без помилки → оригінальний запит повертає рівно два стовпці.</div>
+<div data-fig="img/fig9.png" data-url="web-security-academy.net" data-cap="Рис. 8 — Запит версії: &#x27; UNION SELECT banner, NULL FROM v$version--.">Запит версії: <code>' UNION SELECT banner,NULL FROM v$version--</code>.</div>
+<div data-fig="img/fig10.png" data-url="web-security-academy.net" data-cap="Рис. 9 — Виведення версії Oracle на сторінку та підтвердження виконання завдання.">На сторінці — <code>Oracle Database 11g Express Edition</code>. Завдання виконано.</div>
+    </div>
+  </section>
 
-    <!-- 06 — Завдання 2 -->
-    <section class="slide" data-bg="bottom" data-section="logic">
-      <div class="content task">
-        <div class="task-text">
-          <p class="eyebrow r">Завдання 2 · Login bypass</p>
-          <h2 class="title r">Вхід адміністратором <span class="dim">без пароля</span></h2>
-          <p class="body r">У поле <b>Username</b> введено <code>administrator'--</code>, пароль — будь-який. Перевірка пароля перетворюється на коментар.</p>
-          <div class="code r"><span class="kw">SELECT</span> * <span class="kw">FROM</span> users
-<span class="kw">WHERE</span> username = 'administrator<span class="inj">'--</span><span class="cm"> AND password = '...'</span></div>
-          <p class="payload r">Результат: сесія адміністратора без перевірки пароля</p>
-        </div>
-        <div class="stack">
-          <figure class="r"><div class="frame" style="--mh: 250px"><img src="img/t2-login.png" alt="Форма входу з пейлоадом"></div><figcaption>Рис. 3 — пейлоад у полі Username</figcaption></figure>
-          <figure class="r"><div class="frame" style="--mh: 320px"><img src="img/t2-admin.png" alt="Обліковий запис адміністратора"></div><figcaption>Рис. 4 — вхід як administrator</figcaption></figure>
-        </div>
+  <!-- 09 — Доказ: Завдання 4 -->
+  <section class="slide s-evidence" data-bg="left" data-title="Завдання 4 · MySQL / Microsoft">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 4 · MySQL / Microsoft</p>
+      <h2 class="title sm r">Версія через <span class="dim">@@version</span></h2>
+      <p class="payload r"><code>'+UNION+SELECT+@@version,NULL%23</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">05</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig11.png" data-url="web-security-academy.net" data-cap="Рис. 10 — Перехід до категорії Corporate gifts.">Перехід до категорії <code>Corporate gifts</code> — з'являється вразливий параметр.</div>
+<div data-fig="img/fig12.png" data-url="web-security-academy.net" data-cap="Рис. 11 — Введення SQL-пейлоаду в адресний рядок браузера.">Визначення стовпців: <code>'+UNION+SELECT+NULL,NULL%23</code> (коментар <code>#</code> → <code>%23</code>).</div>
+<div data-fig="img/fig13.png" data-url="web-security-academy.net" data-cap="Рис. 12 — Успішне визначення кількості стовпців (два) значеннями NULL та коментарем #.">Сторінка без помилки → запит повертає два стовпці.</div>
+<div data-fig="img/fig14.png" data-url="web-security-academy.net" data-cap="Рис. 13 — Запит версії: &#x27;+UNION+SELECT+@@version,NULL%23.">Запит версії: <code>'+UNION+SELECT+@@version,NULL%23</code>.</div>
+<div data-fig="img/fig15.png" data-url="web-security-academy.net" data-cap="Рис. 14 — Успішне вилучення версії бази даних (8.0.42-0ubuntu0.20.04.1).">Отримано <code>8.0.42-0ubuntu0.20.04.1</code> — завдання виконано.</div>
+    </div>
+  </section>
 
-    <!-- 07 — Розділ -->
-    <section class="slide hero" data-bg="section" data-section="recon">
-      <div class="center">
-        <p class="eyebrow r">Завдання 3–4</p>
-        <h1 class="display r">Розвідка СУБД<br><span class="dim">UNION-атаки на тип і версію</span></h1>
-        <p class="lead r">Знаючи СУБД, можна обрати правильний синтаксис і системні таблиці для наступних кроків.</p>
+  <!-- 10 — Порівняння -->
+  <section class="slide" data-bg="top" data-title="Порівняння СУБД">
+    <div class="content">
+      <p class="eyebrow r">Порівняння</p>
+      <h2 class="title r">Одна атака — <span class="dim">різний синтаксис</span></h2>
+      <div class="table-wrap r">
+        <table class="compare">
+          <thead><tr><th>Що потрібно</th><th>Oracle</th><th>MySQL / Microsoft</th></tr></thead>
+          <tbody>
+            <tr><td>Порожній SELECT</td><td><code>FROM DUAL</code> обов'язково</td><td>можна без <code>FROM</code></td></tr>
+            <tr><td>Версія</td><td><code>v$version</code> (banner)</td><td><code>@@version</code></td></tr>
+            <tr><td>Коментар</td><td><code>--</code></td><td><code>#</code> (→ <code>%23</code>) або <code>-- </code></td></tr>
+            <tr><td>Список таблиць</td><td><code>all_tables</code></td><td><code>information_schema.tables</code></td></tr>
+            <tr><td>Регістр імен</td><td>ВЕРХНІЙ</td><td>як є</td></tr>
+          </tbody>
+        </table>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 08 — Завдання 3 -->
-    <section class="slide" data-bg="right" data-section="recon">
-      <div class="content task">
-        <div class="task-text">
-          <p class="eyebrow r">Завдання 3 · Oracle</p>
-          <h2 class="title r">Версія Oracle <span class="dim">через v$version</span></h2>
-          <ol class="steps-v">
-            <li class="r"><b>Скільки стовпців?</b><code>' UNION SELECT NULL,NULL FROM DUAL--</code><span>Без помилки → запит повертає 2 стовпці. В Oracle <code>FROM</code> обов'язковий, тому <code>DUAL</code>.</span></li>
-            <li class="r"><b>Читаємо версію</b><code>' UNION SELECT banner,NULL FROM v$version--</code><span>Стовпець <code>banner</code> системного подання з версією.</span></li>
-          </ol>
-          <p class="payload r">Oracle Database 11g Express Edition Release 11.2.0.2.0</p>
-        </div>
-        <figure class="r"><div class="frame" style="--mh: 700px"><img src="img/t3-version.png" alt="Версія Oracle на сторінці"></div><figcaption>Рис. 9 — версія СУБД серед списку товарів</figcaption></figure>
+  <!-- 11 — Розділ -->
+  <section class="slide hero" data-bg="wide" data-title="Витік даних">
+    <div class="center">
+      <p class="eyebrow r">Завдання 5–7</p>
+      <h1 class="display r">Витік даних<br><span class="dim">структура БД → паролі користувачів</span></h1>
+    </div>
+  </section>
+
+  <!-- 12 — Доказ: Завдання 5 -->
+  <section class="slide s-evidence" data-bg="corner" data-title="Завдання 5 · не-Oracle">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 5 · information_schema</p>
+      <h2 class="title sm r">Структура БД <span class="dim">→ паролі</span></h2>
+      <p class="payload r"><code>' UNION SELECT username,password FROM users_...--</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">09</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig16.png" data-url="web-security-academy.net" data-cap="Рис. 15 — Визначення кількості стовпців: &#x27;+UNION+SELECT+NULL,NULL--.">Визначення кількості стовпців: <code>' UNION SELECT NULL,NULL--</code> → два текстові стовпці.</div>
+<div data-fig="img/fig17.png" data-url="web-security-academy.net" data-cap="Рис. 16 — Список таблиць через information_schema.tables.">Список таблиць: <code>... table_name FROM information_schema.tables--</code>.</div>
+<div data-fig="img/fig18.png" data-url="web-security-academy.net" data-cap="Рис. 17 — Серед таблиць знайдено цільову users_hegiue з обліковими даними.">Серед таблиць знайдено цільову <code>users_hegiue</code> з обліковими даними.</div>
+<div data-fig="img/fig19.png" data-url="web-security-academy.net" data-cap="Рис. 18 — Запит назв стовпців через information_schema.columns із фільтром за таблицею.">Запит назв стовпців: <code>... FROM information_schema.columns WHERE table_name='users_hegiue'--</code>.</div>
+<div data-fig="img/fig20.png" data-url="web-security-academy.net" data-cap="Рис. 19 — Визначено точні назви стовпців логіна та пароля.">Визначено точні назви стовпців логіна та пароля.</div>
+<div data-fig="img/fig21.png" data-url="web-security-academy.net" data-cap="Рис. 20 — Підстановка цільових стовпців username_uxnkhp та password_xrrwdz.">Фінальний запит: <code>' UNION SELECT username_uxnkhp,password_xrrwdz FROM users_hegiue--</code>.</div>
+<div data-fig="img/fig22.png" data-url="web-security-academy.net" data-cap="Рис. 21 — Розкриття паролів користувачів carlos, administrator та wiener.">Розкрито паролі користувачів — зокрема <code>administrator</code>.</div>
+<div data-fig="img/fig23.png" data-url="web-security-academy.net" data-cap="Рис. 22 — Використання вилученої пари логін-пароль на сторінці Login.">Вхід за вилученою парою логін-пароль на сторінці Login.</div>
+<div data-fig="img/fig24.png" data-url="web-security-academy.net" data-cap="Рис. 23 — Підтвердження успішного входу під профілем адміністратора.">Успішний вхід під профілем адміністратора — лабораторію пройдено.</div>
+    </div>
+  </section>
 
-    <!-- 09 — Завдання 4 -->
-    <section class="slide" data-bg="left" data-section="recon">
-      <div class="content task">
-        <div class="task-text">
-          <p class="eyebrow r">Завдання 4 · MySQL / Microsoft</p>
-          <h2 class="title r">Версія через <span class="dim">@@version</span></h2>
-          <ol class="steps-v">
-            <li class="r"><b>Скільки стовпців?</b><code>'+UNION+SELECT+NULL,NULL%23</code><span>Тут <code>FROM</code> не потрібен. Коментар <code>#</code> в URL кодується як <code>%23</code>.</span></li>
-            <li class="r"><b>Читаємо версію</b><code>'+UNION+SELECT+@@version,NULL%23</code><span>Глобальна змінна <code>@@version</code> повертає версію сервера.</span></li>
-          </ol>
-          <p class="payload r">8.0.42-0ubuntu0.20.04.1</p>
-        </div>
-        <figure class="r"><div class="frame" style="--mh: 700px"><img src="img/t4-version.png" alt="Версія MySQL на сторінці"></div><figcaption>Рис. 14 — версія бази даних вилучена</figcaption></figure>
+  <!-- 13 — Доказ: Завдання 6 -->
+  <section class="slide s-evidence" data-bg="bottom" data-title="Завдання 6 · Oracle">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 6 · Oracle</p>
+      <h2 class="title sm r">Те саме <span class="dim">без information_schema</span></h2>
+      <p class="payload r"><code>all_tables · all_tab_columns · ВЕРХНІЙ регістр</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">10</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig25.png" data-url="web-security-academy.net" data-cap="Рис. 24 — Перевірка кількості стовпців через UNION SELECT та таблицю dual.">Перевірка стовпців: <code>' UNION SELECT NULL,NULL FROM dual--</code>.</div>
+<div data-fig="img/fig26.png" data-url="web-security-academy.net" data-cap="Рис. 25 — Результат перевірки кількості стовпців на Oracle через dual.">Підтверджено два стовпці на базі Oracle.</div>
+<div data-fig="img/fig27.png" data-url="web-security-academy.net" data-cap="Рис. 26 — Список таблиць через all_tables.">Список таблиць: <code>' UNION SELECT table_name,NULL FROM all_tables--</code>.</div>
+<div data-fig="img/fig28.png" data-url="web-security-academy.net" data-cap="Рис. 27 — Ідентифікація цільової таблиці USERS_OEFIUL.">Знайдено цільову таблицю <code>USERS_OEFIUL</code>.</div>
+<div data-fig="img/fig29.png" data-url="web-security-academy.net" data-cap="Рис. 28 — Підготовка запиту назв стовпців у таблиці USERS_OEFIUL.">Запит назв стовпців через <code>all_tab_columns</code> (ім'я таблиці у ВЕРХНЬОМУ регістрі).</div>
+<div data-fig="img/fig30.png" data-url="web-security-academy.net" data-cap="Рис. 29 — Вилучення назв стовпців PASSWORD_UFWYBY та USERNAME_HJPSCW.">Отримано стовпці <code>USERNAME_HJPSCW</code> та <code>PASSWORD_UFWYBY</code>.</div>
+<div data-fig="img/fig31.png" data-url="web-security-academy.net" data-cap="Рис. 30 — Підстановка цільових стовпців у UNION SELECT.">Фінальний запит: <code>' UNION SELECT USERNAME_HJPSCW,PASSWORD_UFWYBY FROM USERS_OEFIUL--</code>.</div>
+<div data-fig="img/fig32.png" data-url="web-security-academy.net" data-cap="Рис. 31 — Розкриття паролів користувачів administrator, carlos та wiener.">Розкрито паролі користувачів, зокрема <code>administrator</code>.</div>
+<div data-fig="img/fig33.png" data-url="web-security-academy.net" data-cap="Рис. 32 — Використання вилученої пари логін-пароль на сторінці Login.">Вхід за вилученою парою логін-пароль.</div>
+<div data-fig="img/fig34.png" data-url="web-security-academy.net" data-cap="Рис. 33 — Доступ до My Account адміністратора як результат UNION-ін&#x27;єкції.">Доступ до панелі адміністратора — лабораторію пройдено.</div>
+    </div>
+  </section>
 
-    <!-- 10 — Порівняння СУБД -->
-    <section class="slide" data-bg="top" data-section="recon">
-      <div class="content">
-        <p class="eyebrow r">Порівняння</p>
-        <h2 class="title r">Одна атака — <span class="dim">різний синтаксис</span></h2>
-        <div class="table-wrap r">
-          <table class="compare">
-            <thead><tr><th>Що потрібно</th><th>Oracle</th><th>MySQL / Microsoft</th></tr></thead>
-            <tbody>
-              <tr><td>Порожній SELECT</td><td><code>FROM DUAL</code> обов'язково</td><td>можна без <code>FROM</code></td></tr>
-              <tr><td>Версія</td><td><code>v$version</code> (banner)</td><td><code>@@version</code></td></tr>
-              <tr><td>Коментар</td><td><code>--</code></td><td><code>#</code> (→ <code>%23</code>) або <code>-- </code></td></tr>
-              <tr><td>Список таблиць</td><td><code>all_tables</code></td><td><code>information_schema.tables</code></td></tr>
-              <tr><td>Регістр імен</td><td>ВЕРХНІЙ</td><td>як є</td></tr>
-            </tbody>
-          </table>
-        </div>
+  <!-- 14 — Доказ: Завдання 7 -->
+  <section class="slide s-evidence" data-bg="right" data-title="Завдання 7 · UNION">
+    <div class="ev-info">
+      <p class="eyebrow r">Завдання 7 · основа UNION</p>
+      <h2 class="title sm r">Скільки стовпців <span class="dim">повертає запит</span></h2>
+      <p class="payload r"><code>' UNION SELECT NULL,NULL,NULL--</code></p>
+      <div class="stepbox r">
+        <div class="step-meta"><span>Крок <b class="sn">01</b> / <b class="stot">06</b></span><span class="fig-lbl"></span></div>
+        <p class="step-text"></p>
+        <div class="segs"></div>
       </div>
-    </section>
+    </div>
+    <div class="ev-shot r">
+      <figure class="frame shot" tabindex="0" role="button" aria-label="Відкрити скріншот на весь екран">
+        <div class="bar"><span class="lights"><i></i><i></i><i></i></span><span class="shot-url mono"></span><span class="figno mono"></span></div>
+        <div class="shot-img"><img alt=""></div>
+      </figure>
+    </div>
+    <div class="steps-data" hidden>
+<div data-fig="img/fig35.png" data-url="web-security-academy.net" data-cap="Рис. 34 — Перевірка одного стовпця: &#x27;+UNION+SELECT+NULL--.">Перевірка одного стовпця: <code>' UNION SELECT NULL--</code>.</div>
+<div data-fig="img/fig36.png" data-url="web-security-academy.net" data-cap="Рис. 35 — Internal Server Error як реакція на неправильну кількість NULL.">Internal Server Error → стовпців більше ніж один.</div>
+<div data-fig="img/fig37.png" data-url="web-security-academy.net" data-cap="Рис. 36 — Перевірка двох стовпців: &#x27;+UNION+SELECT+NULL,NULL--.">Перевірка двох стовпців: <code>' UNION SELECT NULL,NULL--</code>.</div>
+<div data-fig="img/fig38.png" data-url="web-security-academy.net" data-cap="Рис. 37 — Internal Server Error як реакція на неправильну кількість NULL.">Знову Internal Server Error → і не два.</div>
+<div data-fig="img/fig39.png" data-url="web-security-academy.net" data-cap="Рис. 38 — Успішний запит з трьома NULL: &#x27;+UNION+SELECT+NULL,NULL,NULL--.">Три <code>NULL</code>: <code>' UNION SELECT NULL,NULL,NULL--</code>.</div>
+<div data-fig="img/fig40.png" data-url="web-security-academy.net" data-cap="Рис. 39 — Збіг кількості стовпців: коректна сторінка та повідомлення про успіх.">Збіг — рівно три стовпці. Лабораторію розв'язано.</div>
+    </div>
+  </section>
 
-    <!-- 11 — Розділ -->
-    <section class="slide hero" data-bg="wide" data-section="leak">
-      <div class="center">
-        <p class="eyebrow r">Завдання 5–6</p>
-        <h1 class="display r">Витік даних<br><span class="dim">структура БД → паролі користувачів</span></h1>
+  <!-- 15 — Висновки -->
+  <section class="slide" data-bg="section" data-title="Висновки">
+    <div class="content">
+      <p class="eyebrow r">Висновки</p>
+      <h2 class="title r">Що показала робота</h2>
+      <div class="grid2">
+        <article class="card r"><h3>Маніпуляція логікою</h3><p>Умови <code>' OR 1=1--</code> та <code>administrator'--</code> розкрили приховані дані й обійшли автентифікацію без пароля.</p></article>
+        <article class="card r"><h3>Розвідка СУБД</h3><p><code>v$version</code> і <code>@@version</code> дали тип і версію — відправну точку для наступних векторів атаки.</p></article>
+        <article class="card r"><h3>Повний витік</h3><p>Через <code>information_schema</code> та <code>all_tables</code> розкрито структуру БД і вилучено логіни й паролі.</p></article>
+        <article class="card accent r"><h3>Захист</h3><p>Параметризовані запити (Prepared Statements) і сувора валідація вводу. SQLi лишається однією з найнебезпечніших вразливостей.</p></article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 12 — Завдання 5 кроки -->
-    <section class="slide" data-bg="corner" data-section="leak">
-      <div class="content">
-        <p class="eyebrow r">Завдання 5 · не-Oracle · information_schema</p>
-        <h2 class="title r">Чотири кроки <span class="dim">до облікових даних</span></h2>
-        <div class="steps">
-          <li class="r"><span class="dot"></span><b>Стовпці</b><p><code>' UNION SELECT NULL,NULL--</code> → запит повертає 2 стовпці</p></li>
-          <li class="r"><span class="dot"></span><b>Таблиці</b><p><code>...table_name FROM information_schema.tables--</code> → знайдено <code>users_...</code></p></li>
-          <li class="r"><span class="dot"></span><b>Стовпці таблиці</b><p><code>...column_name ... WHERE table_name='users_...'--</code></p></li>
-          <li class="r"><span class="dot"></span><b>Паролі</b><p><code>' UNION SELECT username,password FROM users_...--</code></p></li>
-        </div>
+  <!-- 16 — Фінал -->
+  <section class="slide hero" data-bg="hero" data-title="Дякую за увагу">
+    <div class="center">
+      <p class="eyebrow r">Дякую за увагу</p>
+      <h1 class="display r">Питання?</h1>
+      <div class="row r">
+        <span class="pill outline">Дзяман Наталія · КБ-307</span>
+        <span class="pill outline">Безпека веб-додатків · №8</span>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 13 — Завдання 5 скриншоти -->
-    <section class="slide" data-bg="left" data-section="leak">
-      <div class="content">
-        <p class="eyebrow r">Завдання 5 · результат</p>
-        <h2 class="title r">Назви таблиць <span class="dim">і паролі користувачів</span></h2>
-        <div class="grid2 shots">
-          <figure class="r"><div class="frame" style="--mh: 560px"><img src="img/t5-tables.png" alt="Назви стовпців таблиці користувачів"></div><figcaption>Рис. 18 — стовпці таблиці <code>users_...</code></figcaption></figure>
-          <figure class="r"><div class="frame" style="--mh: 560px"><img src="img/t5-creds.png" alt="Паролі користувачів на сторінці"></div><figcaption>Рис. 21 — логіни й паролі, зокрема administrator</figcaption></figure>
-        </div>
-      </div>
-    </section>
+</main>
 
-    <!-- 14 — Завдання 6 -->
-    <section class="slide" data-bg="bottom" data-section="leak">
-      <div class="content task">
-        <div class="task-text">
-          <p class="eyebrow r">Завдання 6 · Oracle</p>
-          <h2 class="title r">Те саме, <span class="dim">але без information_schema</span></h2>
-          <p class="body r">Oracle не має <code>information_schema</code>. Метадані беруться із системних таблиць, а імена об'єктів — у ВЕРХНЬОМУ регістрі.</p>
-          <div class="code r"><span class="cm">// таблиці</span>
-' UNION SELECT table_name,NULL FROM <span class="kw">all_tables</span>--
-<span class="cm">// стовпці</span>
-' UNION SELECT column_name,NULL FROM <span class="kw">all_tab_columns</span>
-  WHERE table_name='USERS_...'--</div>
-          <p class="payload r">Отримано пароль administrator → доступ до панелі</p>
-        </div>
-        <div class="stack">
-          <figure class="r"><div class="frame" style="--mh: 250px"><img src="img/t6-table.png" alt="Цільова таблиця Oracle"></div><figcaption>Рис. 27 — таблиця <code>USERS_...</code></figcaption></figure>
-          <figure class="r"><div class="frame" style="--mh: 320px"><img src="img/t6-creds.png" alt="Паролі користувачів Oracle"></div><figcaption>Рис. 31 — вилучені облікові дані</figcaption></figure>
-        </div>
-      </div>
-    </section>
+<!-- lightbox -->
+<div class="lightbox" id="lb" hidden>
+  <img id="lbImg" alt="">
+  <div class="lb-cap" id="lbCap"></div>
+</div>
 
-    <!-- 15 — Завдання 7 -->
-    <section class="slide" data-bg="right" data-section="leak">
-      <div class="content task">
-        <div class="task-text">
-          <p class="eyebrow r">Завдання 7 · основа UNION</p>
-          <h2 class="title r">Скільки стовпців <span class="dim">повертає запит?</span></h2>
-          <p class="body r">Для UNION обидва запити мають мати однакову кількість стовпців. Додаємо <code>NULL</code> по одному, поки помилка не зникне.</p>
-          <div class="code r">' UNION SELECT NULL--            <span class="cm">// помилка</span>
-' UNION SELECT NULL,NULL--       <span class="cm">// помилка</span>
-' UNION SELECT NULL,NULL,NULL--  <span class="hl">// успіх → 3</span></div>
-          <p class="payload r">Рівно 3 стовпці — лабораторію розв'язано</p>
-        </div>
-        <div class="stack">
-          <figure class="r"><div class="frame" style="--mh: 250px"><img src="img/t7-error.png" alt="Internal Server Error при неправильній кількості стовпців"></div><figcaption>Рис. 37 — Internal Server Error</figcaption></figure>
-          <figure class="r"><div class="frame" style="--mh: 320px"><img src="img/t7-solved.png" alt="Успішне розв'язання після трьох NULL"></div><figcaption>Рис. 39 — 3 × NULL, успіх</figcaption></figure>
-        </div>
-      </div>
-    </section>
-
-    <!-- 16 — Висновки -->
-    <section class="slide" data-bg="section" data-section="outro">
-      <div class="content">
-        <p class="eyebrow r">Висновки</p>
-        <h2 class="title r">Що показала робота</h2>
-        <div class="grid2">
-          <article class="card r"><h3>Маніпуляція логікою</h3><p>Умови <code>' OR 1=1--</code> та <code>administrator'--</code> розкрили приховані дані й обійшли автентифікацію без пароля.</p></article>
-          <article class="card r"><h3>Розвідка СУБД</h3><p><code>v$version</code> і <code>@@version</code> дали тип і версію — відправну точку для наступних векторів атаки.</p></article>
-          <article class="card r"><h3>Повний витік</h3><p>Через <code>information_schema</code> та <code>all_tables</code> розкрито структуру БД і вилучено логіни й паролі.</p></article>
-          <article class="card accent r"><h3>Захист</h3><p>Параметризовані запити (Prepared Statements) і сувора валідація вводу. SQLi лишається однією з найнебезпечніших вразливостей.</p></article>
-        </div>
-      </div>
-    </section>
-
-    <!-- 17 — Фінал -->
-    <section class="slide hero" data-bg="hero" data-section="outro">
-      <div class="center">
-        <p class="eyebrow r">Дякую за увагу</p>
-        <h1 class="display r">Питання?</h1>
-        <div class="row r">
-          <span class="pill outline">Дзяман Наталія · КБ-307</span>
-          <span class="pill outline">Безпека веб-додатків · №8</span>
-        </div>
-      </div>
-    </section>
-
-    </main>
-
-    <footer class="bottombar">
-      <div class="progress"><i id="progress"></i></div>
-      <div class="hint">↓ гортайте вниз · F — повний екран</div>
-    </footer>
+<footer class="hint-bar">
+  <span class="hint">↓ / → / колесо — далі · ↑ ← — назад · клік по фото — збільшити · F — повний екран</span>
+</footer>
 
 <script src="bg.js"></script>
 <script src="deck.js"></script>
