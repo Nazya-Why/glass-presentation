@@ -25,23 +25,20 @@ body { -webkit-font-smoothing: antialiased; }
   background: radial-gradient(ellipse 62% 56% at 50% 52%, rgba(0,0,0,0.72), rgba(0,0,0,0.25) 70%, rgba(0,0,0,0) 100%); opacity: 0.55; }
 body.is-content .shade { opacity: 1; }
 
-/* ---------- Side rail ---------- */
+/* ---------- Side rail (left) ---------- */
 .rail { position: fixed; left: 46px; top: 0; height: 100vh; z-index: 10; display: flex; flex-direction: column;
-  justify-content: center; gap: 26px; pointer-events: none; }
-.rail-brand { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3);
-  writing-mode: vertical-rl; transform: rotate(180deg); position: absolute; top: 40px; left: 2px; }
+  justify-content: center; pointer-events: none; }
 .ticks { display: flex; flex-direction: column; gap: 11px; pointer-events: auto; }
 .ticks button { width: 16px; height: 3px; border-radius: 3px; border: 0; padding: 0; cursor: pointer;
   background: rgba(255,255,255,0.20); transition: width .45s var(--ease), background .45s var(--ease), box-shadow .45s var(--ease); }
 .ticks button.seen { background: rgba(255,255,255,0.38); }
 .ticks button.on { width: 42px; background: var(--accent-2); box-shadow: 0 0 16px rgba(140,149,255,.75); }
 .ticks button:hover { width: 30px; background: var(--ink-2); }
-.rail-count { position: absolute; bottom: 40px; left: 0; font-family: var(--mono); font-size: 13px; color: var(--ink-2); letter-spacing: .06em; }
-.rail-count b { color: var(--ink); font-weight: 600; font-size: 16px; }
-.rail-count i { font-style: normal; color: var(--ink-3); }
 
-.hint-bar { position: fixed; right: 46px; bottom: 36px; z-index: 10; }
-.hint { font-size: 13px; color: var(--ink-3); letter-spacing: .01em; }
+/* ---------- Slide counter (top-right) ---------- */
+.counter { position: fixed; top: 40px; right: 52px; z-index: 10; font-family: var(--mono); font-size: 14px; color: var(--ink-2); letter-spacing: .06em; }
+.counter b { color: var(--ink); font-weight: 600; font-size: 18px; }
+.counter i { font-style: normal; color: var(--ink-3); }
 
 /* ---------- Scaled 1920×1080 stage ---------- */
 .stage { position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; z-index: 2;
